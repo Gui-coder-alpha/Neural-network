@@ -9,7 +9,7 @@ matrix_of_ones = np.ones((10,1))
 concatenationX = np.concatenate((features_designX, matrix_of_ones), axis=1)
 
 learning_rate = 0.01
-iterations = 100
+iterations = 100000000
 
 class Optmization():
     def __init__(self, target_designY, concatenationX, learning_rate,iterations):
@@ -52,3 +52,21 @@ model = Optmization(concatenationX=concatenationX, target_designY=target_designY
 final_beta_values, cost_history_results = model.trainement()
 print(final_beta_values)
 print(cost_history_results)
+
+#Graphic part
+fig, axes = plt.subplots(1,2, figsize=(12,5), layout='constrained')
+axes[0].plot(cost_history_results)
+axes[0].set_title("Custo") 
+axes[0].set_xlabel("Iterações") 
+axes[0].set_ylabel("Custo MSE") 
+axes[0].grid(True)
+
+axes[1].scatter(features, target, label='Dados Originais', color='blue', alpha=0.7)
+y_predicted_line = model.concatenationX @ final_beta_values
+axes[1].plot(features, y_predicted_line, color='red', label='Linha de Regressão GD', linewidth=2)
+axes[1].set_title('Regressão Logística com Gradiente Descendente') 
+axes[1].set_xlabel('X')
+axes[1].set_ylabel('Y')
+axes[1].legend() 
+axes[1].grid(True) 
+plt.show()
