@@ -7,9 +7,8 @@ features_designX = features[:,np.newaxis]
 target_designY = target[:,np.newaxis]
 matrix_of_ones = np.ones((10,1))
 concatenationX = np.concatenate((features_designX, matrix_of_ones), axis=1)
-
 learning_rate = 0.01
-iterations = 100000000
+iterations = 100000
 
 class Optmization():
     def __init__(self, target_designY, concatenationX, learning_rate,iterations):
