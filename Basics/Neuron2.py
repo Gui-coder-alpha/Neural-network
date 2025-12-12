@@ -6,7 +6,7 @@ Features = np.array([[1.0, 6.0, 5.9],
                      [7.6, 5.5, 4.2]])
 
 Target = np.array([[5.0, 5.6, 9.0],
-                   [1.2, 5.5, 7.2], #DADO A SEREM ATINGIDOS
+                   [1.2, 5.5, 7.2], #DADO A SEREM ATINGIDOS VALOR = Y
                    [1.2, 7.0, 8.8]])
 
 Matrix_of_ones = np.ones((3,1)) #Bias, PERMITE O AJUSTE DE DADOS , LHE DANDO FLEXIBILDIADE.
@@ -30,20 +30,38 @@ class Execução():
         self.learning_rate = learning_rate
         self.iterations = iterations
         self.epsilon = 1e-10
+        self.cost_history = []
 
     
     def soma_ponderada(self):
         self.Z = self.Features_and_ones @ self.Peso #@ é a multiplicação de matrizes, de colunas para linhas e vice-versa.
+        return self.Z
 
     def sigmoide(self):  #Função da sigmóide é de O(z) = 1/(1+e^-z)         
-        sigmoide_function = 1/(1+np.exp(-self.Z))   #np.exp(valor) pegamos o número de euler e elevamos a um valor variável
-        print(sigmoide_function)
+        self.sigmoide_function = 1/(1+np.exp(-self.Z))   #np.exp(valor) pegamos o número de euler e elevamos a um valor variável
+        return  self.sigmoide_function
+
+    def funcao_de_custo(self):
+        #função de custo, Entropia Cruzada Binária. Fórmula é J = (-1/m) Somatório [Y*log(A)+(1-Y)*log(1-A)] Tal que somatório=média
+        self.m = len(Target)
+        self.equacao = 1/self.m * -np.mean(Target * np.log(self.sigmoide_function + self.epsilon) + (1- Target) * np.log(1-self.sigmoide_function + self.epsilon))
+
+    def gradiente_descendente(self):
+        #fórmula da derivada do gradiente descendente. dW = 1/m * X transposta * (A - Y)
+        self.gradient_descendent = 1/self.m * np.transpose(self.Features_and_ones) @ (self.sigmoide_function - self.Target)
+        print(self.gradient_descendent)
+
+
+    def treinamento(self):
+        for i in range(self.iterations):
+            self.sum_ponderada()
+            self.sigmoide(self.sum_ponderada())
+            print(self.sigmoide_function)
 
     def realizar_todas_as_funcoes(self):
-        self.soma_ponderada()
-        self.sigmoide()
-        self.função_de_custo()
+        self.funcao_de_custo()
         self.gradiente_descendente()
+        self.treinamento()
 
 
 
