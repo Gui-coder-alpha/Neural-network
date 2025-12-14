@@ -33,8 +33,8 @@ class Execução():
         self.cost_history = []
 
     
-    def soma_ponderada(self):
-        self.Z = self.Features_and_ones @ self.Peso #@ é a multiplicação de matrizes, de colunas para linhas e vice-versa.
+    def soma_ponderada(self, Features_of_one, Peso_in_ponderada):
+        self.Z = Features_of_one @ Peso_in_ponderada #@ é a multiplicação de matrizes, de colunas para linhas e vice-versa.
         return self.Z
 
     def sigmoide(self):  #Função da sigmóide é de O(z) = 1/(1+e^-z)         
@@ -45,26 +45,26 @@ class Execução():
         #função de custo, Entropia Cruzada Binária. Fórmula é J = (-1/m) Somatório [Y*log(A)+(1-Y)*log(1-A)] Tal que somatório=média
         self.m = len(Target)
         self.equacao = 1/self.m * -np.mean(Target * np.log(self.sigmoide_function + self.epsilon) + (1- Target) * np.log(1-self.sigmoide_function + self.epsilon))
-
+        return self.equacao
     def gradiente_descendente(self):
         #fórmula da derivada do gradiente descendente. dW = 1/m * X transposta * (A - Y)
         self.gradient_descendent = 1/self.m * np.transpose(self.Features_and_ones) @ (self.sigmoide_function - self.Target)
-        print(self.gradient_descendent)
+        return self.gradient_descendent
 
 
     def treinamento(self):
         for i in range(self.iterations):
-            self.sum_ponderada()
-            self.sigmoide(self.sum_ponderada())
-            print(self.sigmoide_function)
-
-    def realizar_todas_as_funcoes(self):
-        self.funcao_de_custo()
-        self.gradiente_descendente()
-        self.treinamento()
-
-
+            sigmoide_com_Z = self.sigmoide(self.Features_and_ones, self.Peso)
+            print(sigmoide_com_Z)
+            custo = self.funcao_de_custo(sigmoide_com_Z)
+            custo.append(self.cost_history)
+            valor_do_gradiente = self.gradiente_descendente(sigmoide_com_Z)
+            self.Peso = self.Peso - self.learning_rate * valor_do_gradiente
+            print(self.cost_history)
+        return self.Peso, self.cost_history
 
 
-Execute_all = Execução(Features_and_ones, Peso, Target, learning_rate, iterations)
-Execute_all.realizar_todas_as_funcoes()
+Execute_all = Execução(Features_and_ones, Peso, Target, learning_rate, iterations) 
+resultado, historico = Execute_all.treinamento()
+print(resultado)
+print(historico)
