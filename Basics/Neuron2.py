@@ -1,18 +1,18 @@
 import numpy as np
-import matplotlib as plt
+import matplotlib.pylab as plt
 
 Features = np.array([[1.0, 6.0, 5.9],
                      [9.0, 1.5, 8.8], #DADOS PRINCIPAIS
                      [7.6, 5.5, 4.2]])
 
-Target = np.array([[5.0, 5.6, 9.0],
-                   [1.2, 5.5, 7.2], #DADO A SEREM ATINGIDOS VALOR = Y
-                   [1.2, 7.0, 8.8]])
+Target = np.array([[0.3, 0.9, 1.0],
+                   [0.1, 0.7, 0.4], #DADO A SEREM ATINGIDOS VALOR = Y
+                   [0.7, 1.0, 0.2]])
 
 Matrix_of_ones = np.ones((3,1)) #Bias, PERMITE O AJUSTE DE DADOS , LHE DANDO FLEXIBILDIADE.
 
 learning_rate = 0.01
-iterations = 100000
+iterations = 10000
 
 Peso = np.random.randn(4,3) #Sinal para ajustar na saida final do sinal, de cada neurônio, O TAMANHO DEVE SER A OPOSTA DE FEATURES CONCATENADA COM BIAS(BIAS CONCATENADA COM FEATURES TAMANHO IGUAL A 3X4), PESO DEVE SER 4X3.
 Features_and_ones = np.concatenate((Features, Matrix_of_ones), axis=1) #Ao juntar Bias com Features, criamos um ajuste de dados na hora de realizar a função linear.
@@ -33,38 +33,54 @@ class Execução():
         self.cost_history = []
 
     
-    def soma_ponderada(self, Features_of_one, Peso_in_ponderada):
-        self.Z = Features_of_one @ Peso_in_ponderada #@ é a multiplicação de matrizes, de colunas para linhas e vice-versa.
+    def soma_ponderada(self):
+        self.Z = self.Features_and_ones @ self.Peso #@ é a multiplicação de matrizes, de colunas para linhas e vice-versa.
         return self.Z
 
-    def sigmoide(self):  #Função da sigmóide é de O(z) = 1/(1+e^-z)         
-        self.sigmoide_function = 1/(1+np.exp(-self.Z))   #np.exp(valor) pegamos o número de euler e elevamos a um valor variável
+    def sigmoide(self, valor_Z):  #Função da sigmóide é de O(z) = 1/(1+e^-z)         
+        self.sigmoide_function = 1/(1+np.exp(-np.clip(valor_Z, -500, 500)))   #np.exp(valor) pegamos o número de euler e elevamos a um valor variável
         return  self.sigmoide_function
 
-    def funcao_de_custo(self):
+    def funcao_de_custo(self, sigmoide_value):
         #função de custo, Entropia Cruzada Binária. Fórmula é J = (-1/m) Somatório [Y*log(A)+(1-Y)*log(1-A)] Tal que somatório=média
         self.m = len(Target)
-        self.equacao = 1/self.m * -np.mean(Target * np.log(self.sigmoide_function + self.epsilon) + (1- Target) * np.log(1-self.sigmoide_function + self.epsilon))
+        self.equacao = -np.mean(Target * np.log(sigmoide_value + self.epsilon) + (1- Target) * np.log(1-sigmoide_value + self.epsilon))
         return self.equacao
-    def gradiente_descendente(self):
+    def gradiente_descendente(self, sigmoide_value):
         #fórmula da derivada do gradiente descendente. dW = 1/m * X transposta * (A - Y)
-        self.gradient_descendent = 1/self.m * np.transpose(self.Features_and_ones) @ (self.sigmoide_function - self.Target)
+        self.gradient_descendent = 1/self.m * np.transpose(self.Features_and_ones) @ (sigmoide_value - self.Target)
         return self.gradient_descendent
 
-
-    def treinamento(self):
+    def TREINAMENTO(self):
         for i in range(self.iterations):
-            sigmoide_com_Z = self.sigmoide(self.Features_and_ones, self.Peso)
-            print(sigmoide_com_Z)
-            custo = self.funcao_de_custo(sigmoide_com_Z)
-            custo.append(self.cost_history)
-            valor_do_gradiente = self.gradiente_descendente(sigmoide_com_Z)
-            self.Peso = self.Peso - self.learning_rate * valor_do_gradiente
-            print(self.cost_history)
-        return self.Peso, self.cost_history
+            valor_Z = self.soma_ponderada()
+            sigmoide_value = self.sigmoide(valor_Z)
+            valor_de_custo = self.funcao_de_custo(sigmoide_value)
+            self.cost_history.append(valor_de_custo)
+            valor_do_gradiente = self.gradiente_descendente(sigmoide_value)
+            New_peso = self.Peso - learning_rate * valor_do_gradiente
+            self.Peso = New_peso
+        return valor_de_custo, New_peso
 
 
-Execute_all = Execução(Features_and_ones, Peso, Target, learning_rate, iterations) 
-resultado, historico = Execute_all.treinamento()
-print(resultado)
-print(historico)
+EXECUTAR = Execução(Features_and_ones, Peso, Target, learning_rate, iterations) 
+EXECUTAR.TREINAMENTO()
+
+valores_de_custos_totais, valores_do_peso_novo = EXECUTAR.TREINAMENTO()
+
+fig, axes = plt.subplots(1,2, figsize=(12,5), layout='constrained')
+axes[0].plot(valores_de_custos_totais)
+axes[0].set_title("Custo") 
+axes[0].set_xlabel("Iterações") 
+axes[0].set_ylabel("Custo MSE") 
+axes[0].grid(True)
+
+axes[1].scatter(Features, Target, label='Dados Originais', color='blue', alpha=0.7)
+y_predicted_line = Features_and_ones @ valores_do_peso_novo
+axes[1].plot(Features, y_predicted_line, color='red', label='Linha de Regressão GD', linewidth=2)
+axes[1].set_title('Regressão Logística com Gradiente Descendente') 
+axes[1].set_xlabel('X')
+axes[1].set_ylabel('Y')
+axes[1].legend() 
+axes[1].grid(True) 
+plt.show()
