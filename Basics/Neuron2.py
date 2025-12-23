@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pylab as plt
+import seaborn as sns
+
 
 Features = np.array([[1.0, 6.0, 5.9],
                      [9.0, 1.5, 8.8], #DADOS PRINCIPAIS
@@ -12,7 +14,7 @@ Target = np.array([[0.3, 0.9, 1.0],
 Matrix_of_ones = np.ones((3,1)) #Bias, PERMITE O AJUSTE DE DADOS , LHE DANDO FLEXIBILDIADE.
 
 learning_rate = 0.01
-iterations = 10000
+iterations = 100000
 
 Peso = np.random.randn(4,3) #Sinal para ajustar na saida final do sinal, de cada neurônio, O TAMANHO DEVE SER A OPOSTA DE FEATURES CONCATENADA COM BIAS(BIAS CONCATENADA COM FEATURES TAMANHO IGUAL A 3X4), PESO DEVE SER 4X3.
 Features_and_ones = np.concatenate((Features, Matrix_of_ones), axis=1) #Ao juntar Bias com Features, criamos um ajuste de dados na hora de realizar a função linear.
@@ -67,20 +69,6 @@ EXECUTAR = Execução(Features_and_ones, Peso, Target, learning_rate, iterations
 EXECUTAR.TREINAMENTO()
 
 valores_de_custos_totais, valores_do_peso_novo = EXECUTAR.TREINAMENTO()
-
-fig, axes = plt.subplots(1,2, figsize=(12,5), layout='constrained')
-axes[0].plot(valores_de_custos_totais)
-axes[0].set_title("Custo") 
-axes[0].set_xlabel("Iterações") 
-axes[0].set_ylabel("Custo MSE") 
-axes[0].grid(True)
-
-axes[1].scatter(Features, Target, label='Dados Originais', color='blue', alpha=0.7)
-y_predicted_line = Features_and_ones @ valores_do_peso_novo
-axes[1].plot(Features, y_predicted_line, color='red', label='Linha de Regressão GD', linewidth=2)
-axes[1].set_title('Regressão Logística com Gradiente Descendente') 
-axes[1].set_xlabel('X')
-axes[1].set_ylabel('Y')
-axes[1].legend() 
-axes[1].grid(True) 
-plt.show()
+print(valores_de_custos_totais)
+print('//////////////')
+print(valores_do_peso_novo)
