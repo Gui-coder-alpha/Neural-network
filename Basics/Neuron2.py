@@ -14,7 +14,7 @@ Target = np.array([[0.3, 0.9, 1.0],
 Matrix_of_ones = np.ones((3,1)) #Bias, PERMITE O AJUSTE DE DADOS , LHE DANDO FLEXIBILDIADE.
 
 learning_rate = 0.01
-iterations = 100
+iterations = 10000
 
 # Peso = np.random.randn(4,3) #Sinal para ajustar na saida final do sinal, de cada neurônio, O TAMANHO DEVE SER A OPOSTA DE FEATURES CONCATENADA COM BIAS(BIAS CONCATENADA COM FEATURES TAMANHO IGUAL A 3X4), PESO DEVE SER 4X3.
 Features_and_ones = np.concatenate((Features, Matrix_of_ones), axis=1) #Ao juntar Bias com Features, criamos um ajuste de dados na hora de realizar a função linear.
@@ -54,9 +54,9 @@ class Execução():
 
         Z2 = A1_with_bias @ W2 #Multiplicamos os valores de ativação número 1 com o W2, criando assim uma nova entrada de dados denominada de Z2
         A2 = self.sigmoide(Z2) #A2 = ativação número 2. *Nota, não é necessário o bias*
-        return A2, A1_with_bias
+        return A2, A1_with_bias, A1
 
-    def backward_function(self, A1, A2):
+    def backward_function(self, A2, A1):
         #Cálculo do delta de saída é dado pela fórmula: S= sigma  S2 = (A2 - Y) * (A2 * (1 - A2))
         delta_saida2 = (A2 - self.Target) * (A2 * (1 - A2))
 
@@ -67,39 +67,38 @@ class Execução():
         #função de custo, Entropia Cruzada Binária. Fórmula é J = (-1/m) Somatório [Y*log(A)+(1-Y)*log(1-A)] Tal que somatório=média
         #Com as hidden layers fazemos o seguinte, a fórmula que temos agora é J = (-1/m) somatório de [Y*Log(A2)+(1-Y)*Log(A2)]
         self.m = len(Target)
-        self.equacao = -np.mean(Target * np.log(A2) + (1 - self.Target) * np.log(1 - A2 + self.epsilon))
+        self.equacao = -np.mean(Target * np.log(A2 + self.epsilon) + (1 - self.Target) * np.log(1 - A2 + self.epsilon))
         return self.equacao
 
 
     def gradiente_descendente(self, delta_saida1, delta_saida2, A1_with_bias):
         #fórmula da derivada do gradiente descendente. dW = 1/m * X transposta * (A - Y)
         #Para as hidden layers alteramos um aspecto, no lugar de X e (A - Y) usamos os novos valores de A1 com bias embutido no lugar de X e a saida de delta no lugar de (A-Y)
-        self.gradient_descendent_W2 = 1/self.m * np.transpose(A1_with_bias) @ (delta_saida2) #Gradiente para pponte final de W2
+        gradient_descendent_W2 = 1/self.m * np.transpose(A1_with_bias) @ (delta_saida2) #Gradiente para pponte final de W2
+        gradient_descendent_W1 = 1/self.m * np.transpose(self.Features_and_ones) @ (delta_saida1)# Gradiente para a primeira ponte de W1
+        return gradient_descendent_W1, gradient_descendent_W2
 
-        self.gradient_descendent_W1 = 1/self.m * np.transpose(self.Features_and_ones) @ (delta_saida1)# Gradiente para a primeira ponte de W1
 
-    def new_weights(self):
-        self.W1 -= learning_rate * self.gradient_descendent_W1
-        self.W2 -= learning_rate * self.gradient_descendent_W2
+    def new_weights(self, valor_do_gradiente1, valor_do_gradiente2):
+        self.W1 -= learning_rate * valor_do_gradiente1
+        self.W2 -= learning_rate * valor_do_gradiente2
 
 
     def TREINAMENTO(self):
         for i in range(self.iterations):
-            pesos_value = self.foward_function(self.W1, self.W2)
-            valor_de_custo = self.funcao_de_custo(pesos_value)
+            A2, a1_with_bias, A1 = self.foward_function(self.W1, self.W2)
+            valor_de_custo = self.funcao_de_custo(A2)
             self.cost_history.append(valor_de_custo)
-            backward_results = self.backward_function(pesos_value)
-            valor_do_gradiente = self.gradiente_descendente(backward_results, pesos_value)
-            new_weights = self.new_weights()
-            New_peso = new_weights
-            self.Peso = New_peso
+            backward_result1, backward_result2 = self.backward_function(A2, A1)
+            valor_do_gradiente1, valor_do_gradiente2 = self.gradiente_descendente(backward_result1, backward_result2, a1_with_bias)
+            new_weights = self.new_weights(valor_do_gradiente1, valor_do_gradiente2)
+            New_peso = valor_do_gradiente1, valor_do_gradiente2
         return valor_de_custo, New_peso
 
 
-EXECUTAR = Execução(Features_and_ones, Target, learning_rate, iterations) 
-EXECUTAR.TREINAMENTO()
-
+EXECUTAR = Execução(Features_and_ones, Target, learning_rate, iterations)
 valores_de_custos_totais, valores_do_peso_novo = EXECUTAR.TREINAMENTO()
+
 print(valores_de_custos_totais)
 print("///////////////////////////////////")
 print(valores_do_peso_novo)
