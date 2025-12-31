@@ -48,31 +48,40 @@ class Execução():
         return  self.sigmoide_function
 
     def foward_function(self):
+        #A fórmula do foward function é denotada por: A2 = sigmoide de (concatenar com(sigmodie de(X * W1) * W2))  
         self.Z1 = self.Features_and_ones @ self.W1 #Multiplicamos a entrada dos dados já com o bias embutido com o W1 Nota Z1 = soma ponderada número 1
         self.A1 = self.sigmoide(self.Z1) #A1 = ativação número 1 com base no valor de Z1 que obtemos, colocando Z1 na sigmoide
         self.A1_with_bias = np.concatenate((self.A1, self.matiz_de_um), axis=1) #concatenando com os bias intermediário junto com A1, agora temos a ativação com bias
 
         self.Z2 = self.A1_with_bias @ self.W2 #Multiplicamos os valores de ativação número 1 com o W2, criando assim uma nova entrada de dados denominada de Z2
-        self.A2 = self.sigmoide(self.Z2) #A2 = ativação número 2
-        print(self.A2)
+        self.A2 = self.sigmoide(self.Z2) #A2 = ativação número 2. *Nota, não é necessário o bias*
 
+    def backward_function(self):
+        #Cálculo do delta de saída é dado pela fórmula: S= sigma  S2 = (A2 - Y) * (A2 * (1 - A2))
+        self.delta_saida2 = (self.A2 - self.Target) * (self.A2 * (1 - self.A2))
+
+        self.delta_saida1 = self.delta_saida2 @ self.W2[:-1,:].T * (self.A1 * (1 - self.A1))
+        print(self.delta_saida1)
 
 
     def funcao_de_custo(self, sigmoide_value):
         #função de custo, Entropia Cruzada Binária. Fórmula é J = (-1/m) Somatório [Y*log(A)+(1-Y)*log(1-A)] Tal que somatório=média
+        #Com as hidden layers fazemos o seguinte, a fórmula que temos agora é J = (-1/m) somatório de [Y*Log(A2)+(1-Y)*Log(A2)]
         self.m = len(Target)
-        self.equacao = -np.mean(Target * np.log(sigmoide_value + self.epsilon) + (1- Target) * np.log(1-sigmoide_value + self.epsilon))
+        self.equacao = -np.mean(Target * np.log(self.A2 + self.epsilon) + (1 - Target) * np.log(1 - self.A2 + self.epsilon))
         return self.equacao
-    
+
 
     def gradiente_descendente(self, sigmoide_value):
         #fórmula da derivada do gradiente descendente. dW = 1/m * X transposta * (A - Y)
-        self.gradient_descendent = 1/self.m * np.transpose(self.Features_and_ones) @ (sigmoide_value - self.Target)
+        #Para as hidden layers alteramos um aspecto, no lugar de X e (A - Y) usamos os novos valores de A1 com bias embutido no lugar de X e a saida de delta no lugar de (A-Y)
+        self.gradient_descendent = 1/self.m * np.transpose(self.A1_with_bias) @ (self.delta_saida)
         return self.gradient_descendent
 
     def ativar_funcao(self):
         self.foward_function()
         self.funcao_de_custo(self.sigmoide_function)
+        self.backward_function()
         self.gradiente_descendente(self.sigmoide_function)
 
 
