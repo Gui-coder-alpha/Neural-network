@@ -1,7 +1,5 @@
 import numpy as np
 import matplotlib.pylab as plt
-import seaborn as sns
-
 
 Features = np.array([[1.0, 6.0, 5.9],
                      [9.0, 1.5, 8.8], #DADOS PRINCIPAIS
@@ -14,7 +12,7 @@ Target = np.array([[0.3, 0.9, 1.0],
 Matrix_of_ones = np.ones((3,1)) #Bias, PERMITE O AJUSTE DE DADOS , LHE DANDO FLEXIBILDIADE.
 
 learning_rate = 0.01
-iterations = 10000
+iterations = 100000
 
 # Peso = np.random.randn(4,3) #Sinal para ajustar na saida final do sinal, de cada neurônio, O TAMANHO DEVE SER A OPOSTA DE FEATURES CONCATENADA COM BIAS(BIAS CONCATENADA COM FEATURES TAMANHO IGUAL A 3X4), PESO DEVE SER 4X3.
 Features_and_ones = np.concatenate((Features, Matrix_of_ones), axis=1) #Ao juntar Bias com Features, criamos um ajuste de dados na hora de realizar a função linear.
@@ -93,17 +91,29 @@ class Execução():
             valor_do_gradiente1, valor_do_gradiente2 = self.gradiente_descendente(backward_result1, backward_result2, a1_with_bias)
             new_weights = self.new_weights(valor_do_gradiente1, valor_do_gradiente2)
             New_peso = valor_do_gradiente1, valor_do_gradiente2
-        return valor_de_custo, New_peso
+        return self.cost_history, New_peso
 
 
 EXECUTAR = Execução(Features_and_ones, Target, learning_rate, iterations)
 valores_de_custos_totais, valores_do_peso_novo = EXECUTAR.TREINAMENTO()
-
-print(valores_de_custos_totais)
-print("///////////////////////////////////")
-print(valores_do_peso_novo)
+gradiente_W1, gradiente_W2 = valores_do_peso_novo
+New_target = Target.flatten()
+print(gradiente_W1.flatten())
 
 
 #W1 e W2. W1 é um conjunto de pesos que são misturados com os dados de entradas, modificando-os e transformando em 2 neurônios ocultos
 #extraindo os mais diversos padrôes. W2 é a resposta da camada oculta, que é levada para os nosso neurônios de saída
 #tal que obtemos uma saída dependente de W1.
+
+#Parte Gráfica
+fig, axes = plt.subplots(1,2, figsize=(12,5), layout='constrained')
+plt.grid(True)
+axes[0].set_title("Gráfico do Custo")
+axes[1].set_title("Gráfico do Gradiente")
+
+axes[0].plot(valores_de_custos_totais)
+
+
+axes[1].scatter(range(len(New_target)),New_target, color='red', alpha=0.7, label='Dados Originais')
+
+plt.show()
