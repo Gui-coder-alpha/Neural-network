@@ -30,11 +30,12 @@ class Execução():
         self.iterations = iterations
         self.epsilon = 1e-10
         self.cost_history = []
+        self.gradient_W1_history = []
+        self.gradient_W2_history = []
         self.matiz_de_um = np.ones((3,1))
 
         self.W1 = np.random.randn(4,2) #Novos pesos W1 e W2
         self.W2 = np.random.randn(3,3)
-
     
     #def soma_ponderada(self):
        # Z = Features_and_ones @ self.Peso #@ é a multiplicação de matrizes, de colunas para linhas e vice-versa.
@@ -68,7 +69,6 @@ class Execução():
         self.equacao = -np.mean(Target * np.log(A2 + self.epsilon) + (1 - self.Target) * np.log(1 - A2 + self.epsilon))
         return self.equacao
 
-
     def gradiente_descendente(self, delta_saida1, delta_saida2, A1_with_bias):
         #fórmula da derivada do gradiente descendente. dW = 1/m * X transposta * (A - Y)
         #Para as hidden layers alteramos um aspecto, no lugar de X e (A - Y) usamos os novos valores de A1 com bias embutido no lugar de X e a saida de delta no lugar de (A-Y)
@@ -76,11 +76,9 @@ class Execução():
         gradient_descendent_W1 = 1/self.m * np.transpose(self.Features_and_ones) @ (delta_saida1)# Gradiente para a primeira ponte de W1
         return gradient_descendent_W1, gradient_descendent_W2
 
-
     def new_weights(self, valor_do_gradiente1, valor_do_gradiente2):
         self.W1 -= learning_rate * valor_do_gradiente1
         self.W2 -= learning_rate * valor_do_gradiente2
-
 
     def TREINAMENTO(self):
         for i in range(self.iterations):
@@ -89,17 +87,15 @@ class Execução():
             self.cost_history.append(valor_de_custo)
             backward_result1, backward_result2 = self.backward_function(A2, A1)
             valor_do_gradiente1, valor_do_gradiente2 = self.gradiente_descendente(backward_result1, backward_result2, a1_with_bias)
+            self.gradient_W1_history.append(np.mean(np.abs(valor_do_gradiente1)))
+            self.gradient_W2_history.append(np.mean(np.abs(valor_do_gradiente2)))
+            New_peso = self.gradient_W1_history, self.gradient_W2_history
             new_weights = self.new_weights(valor_do_gradiente1, valor_do_gradiente2)
-            New_peso = valor_do_gradiente1, valor_do_gradiente2
         return self.cost_history, New_peso
-
 
 EXECUTAR = Execução(Features_and_ones, Target, learning_rate, iterations)
 valores_de_custos_totais, valores_do_peso_novo = EXECUTAR.TREINAMENTO()
 gradiente_W1, gradiente_W2 = valores_do_peso_novo
-New_target = Target.flatten()
-print(gradiente_W1.flatten())
-
 
 #W1 e W2. W1 é um conjunto de pesos que são misturados com os dados de entradas, modificando-os e transformando em 2 neurônios ocultos
 #extraindo os mais diversos padrôes. W2 é a resposta da camada oculta, que é levada para os nosso neurônios de saída
@@ -107,13 +103,20 @@ print(gradiente_W1.flatten())
 
 #Parte Gráfica
 fig, axes = plt.subplots(1,2, figsize=(12,5), layout='constrained')
-plt.grid(True)
+axes[0].grid(True)
+axes[1].grid(True)
+
 axes[0].set_title("Gráfico do Custo")
 axes[1].set_title("Gráfico do Gradiente")
 
 axes[0].plot(valores_de_custos_totais)
+axes[0].set_ylabel('Valor do erro')
+axes[0].set_xlabel('Iterações')
 
+axes[1].plot(gradiente_W1, color='blue', label='Gradiente W1', linewidth=2)
+axes[1].plot(gradiente_W2, color='green', label='Gradiente W2', linewidth=2)
+axes[1].set_ylabel('Magnitude do Gradiente')
+axes[1].set_xlabel('Iterações')
 
-axes[1].scatter(range(len(New_target)),New_target, color='red', alpha=0.7, label='Dados Originais')
-
+plt.legend()
 plt.show()
