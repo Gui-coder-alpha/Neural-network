@@ -18,6 +18,10 @@ Target = np.array([[0.3, 0.9, 1.0],
                    [0.1, 0.7, 0.4],
                    [0.7, 1.0, 0.2]])
 
+media = np.argmin(Target)
+print(media)
+
+
 Matrix_of_ones = np.ones((3,1))
 
 learning_rate = 0.01
@@ -25,10 +29,6 @@ iterations = 100000
 
 
 Features_and_ones = np.concatenate((Features, Matrix_of_ones), axis=1)
-
-
-
-
 
 class Execução():
     def __init__(self, Features_and_ones, Target, learning_rate, iterations):
@@ -41,7 +41,8 @@ class Execução():
         self.gradient_W1_history = []
         self.gradient_W2_history = []
         self.matiz_de_um1 = np.ones((3,1))
-        def soma_ponderada(self):
+    
+    def soma_ponderada(self):
         Z = Features_and_ones @ self.Peso #@ é a multiplicação de matrizes, de colunas para linhas e vice-versa.
         return Z
 
@@ -78,6 +79,7 @@ class Execução():
 
     def TREINAMENTO(self):
         for i in range(self.iterations):
+            print(f"Iterações: {i}")
 
 
 EXECUTAR = Execução(Features_and_ones, Target, learning_rate, iterations)
