@@ -18,9 +18,6 @@ Target = np.array([[0.3, 0.9, 1.0],
                    [0.1, 0.7, 0.4],
                    [0.7, 1.0, 0.2]])
 
-media = np.argmin(Target)
-print(media)
-
 
 Matrix_of_ones = np.ones((3,1))
 
@@ -31,16 +28,16 @@ iterations = 100000
 Features_and_ones = np.concatenate((Features, Matrix_of_ones), axis=1)
 
 class Execução():
-    def __init__(self, Features_and_ones, Target, learning_rate, iterations):
-        self.Features_and_ones = Features_and_ones
+    def __init__(self, Target, W1=None, W2=None):
         self.Target = Target
-        self.learning_rate = learning_rate
-        self.iterations = iterations
-        self.epsilon = 1e-10
-        self.cost_history = []
-        self.gradient_W1_history = []
-        self.gradient_W2_history = []
         self.matiz_de_um1 = np.ones((3,1))
+
+        if W1 is not None and W2 is not None:
+            self.W1 = W1
+            self.W2 = W2
+        else:
+            self.W1 = np.random.randn(4, 2)
+            self.W2 = np.random.randn(3, 3) 
     
     def soma_ponderada(self):
         Z = Features_and_ones @ self.Peso #@ é a multiplicação de matrizes, de colunas para linhas e vice-versa.
@@ -50,58 +47,68 @@ class Execução():
         sigmoide_function = 1/(1+np.exp(-np.clip(valor_Z, -500, 500))) 
         return  sigmoide_function
     
-    def originals_weights(self):
-        self.W1_father = np.random.randn(4,2)
-        self.W2_father = np.random.randn(3,3)
+    def mutacao(self, minimal_rate=0.01): #Filhos
+        self.W1 += np.random.rand(4,2) * minimal_rate
+        self.W2 += np.random.rand(3,3) * minimal_rate
         return self.W1, self.W2
-    
-    def mutacao(self, father_weights, minimal_rate=0.01):
-        self.W1_son = father_weights + np.random.rand(4,2) * minimal_rate
-        self.W2_son = father_weights + np.random.rand(3,3) * minimal_rate
 
 
-    def foward_function(self, W1, W2):
+    def foward_function(self, matrix):
         #A fórmula do foward function é denotada por: A2 = sigmoide de (concatenar com(sigmodie de(X * W1) * W2))  
-        Z1 = self.Features_and_ones @ W1
+        Z1 = matrix @ self.W1
         A1 = self.sigmoide(Z1)
-        A1_with_bias = np.concatenate((A1, self.matiz_de_um), axis=1)
+        A1_with_bias = np.concatenate((A1, self.matiz_de_um1), axis=1)
 
-        Z2 = A1_with_bias @ W2 
+        Z2 = A1_with_bias @ self.W2 
         A2 = self.sigmoide(Z2)
-        return A2, A1_with_bias, A1
+        return A2
+    
 
-    def funcao_de_aptidao(self, A2):
-        #função de aptidao, Entropia Cruzada Binária. Fórmula é J = (-1/m) Somatório [Y*log(A)+(1-Y)*log(1-A)] Tal que somatório=média
-        #Com as hidden layers fazemos o seguinte, a fórmula que temos agora é J = (-1/m) somatório de [Y*Log(A2)+(1-Y)*Log(A2)]
-        self.m = len(Target)
-        self.equacao = -np.mean(Target * np.log(A2 + self.epsilon) + (1 - self.Target) * np.log(1 - A2 + self.epsilon))
+    def funcao_de_aptidao(self, saida):
+        #função de aptidao, ou de custo, Mean Squared Error(MSE), vai ser utilizado
+        #Dado a fórmula: 1/n somatório de (Target - Saída)² ou 1/n somatório de (Y - A2)
+        #Aqui o cálculo de custo se torna cálculo de aptidão, o qual selecionamos o melhor
+        self.equacao = np.mean(np.square(self.Target - saida)) #saida = A2
         return self.equacao
+    
 
-    def TREINAMENTO(self):
-        for i in range(self.iterations):
-            print(f"Iterações: {i}")
+#Não temos a função de treinamento, vamos ter um loop por parte de fora para realizar toda a operação
+#Tal que, ao colocar tudo dentro da classe vamos gerenciar inúmeros dados de uma vez só, sendo não só 1
+#mas 99 ou mais ao lado, ou seja iriámos ter diversas redes na mesma classe, se tornando um código
+#espaguete.
 
 
-EXECUTAR = Execução(Features_and_ones, Target, learning_rate, iterations)
-valores_de_custos_totais, valores_do_peso_novo = EXECUTAR.TREINAMENTO()
-gradiente_W1, gradiente_W2 = valores_do_peso_novo
+Populacao = [Execução(Target) for _ in range(100)]
+
+Erro_da_geração = []
+geracao = 1000
+
+
+for rede in range(geracao):
+    custos = []
+    for individuo in Populacao:
+        saida = individuo.foward_function(Features_and_ones)
+        erro = individuo.funcao_de_aptidao(saida) #saida = A2
+        custos.append(erro)
+    
+    Resultados_filtrados = np.argmin(custos)
+    Melhor_individuo = Populacao[Resultados_filtrados]
+    Erro_da_geração.append(custos[Resultados_filtrados])
+    
+    nova_geracao = []
+
+    vencedor =Execução(Target, np.copy(Melhor_individuo.W1), np.copy(Melhor_individuo.W2))
+    nova_geracao.append(vencedor)
+
+    for _ in range(100 - 1):
+        clone = Execução(Target, np.copy(Melhor_individuo.W1), np.copy(Melhor_individuo.W2))
+        clone.mutacao(0.01)
+        nova_geracao.append(clone)
+    
+    Populacao = nova_geracao
+
+
+    
+
 
 #Parte Gráfica
-fig, axes = plt.subplots(1,2, figsize=(12,5), layout='constrained')
-axes[0].grid(True)
-axes[1].grid(True)
-
-axes[0].set_title("Gráfico do Custo")
-axes[1].set_title("Gráfico do Gradiente")
-
-axes[0].plot(valores_de_custos_totais)
-axes[0].set_ylabel('Valor do erro')
-axes[0].set_xlabel('Iterações')
-
-axes[1].plot(gradiente_W1, color='blue', label='Gradiente W1', linewidth=2)
-axes[1].plot(gradiente_W2, color='green', label='Gradiente W2', linewidth=2)
-axes[1].set_ylabel('Magnitude do Gradiente')
-axes[1].set_xlabel('Iterações')
-
-plt.legend()
-plt.show()
