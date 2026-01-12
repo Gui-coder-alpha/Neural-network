@@ -81,7 +81,7 @@ class Execução():
 Populacao = [Execução(Target) for _ in range(100)]
 
 Erro_da_geração = []
-geracao = 1000
+geracao = 100000
 
 
 for rede in range(geracao):
@@ -107,8 +107,13 @@ for rede in range(geracao):
     
     Populacao = nova_geracao
 
-
-    
-
-
 #Parte Gráfica
+fig, axes = plt.subplots(1,2, figsize=(12,5), layout='constrained')
+axes[0].grid(True)
+axes[0].set_title("Gráfico do Custo")
+axes[0].plot(Erro_da_geração)
+axes[0].set_ylabel('Valor do erro')
+axes[0].set_xlabel('Iterações')
+
+plt.legend()
+plt.show()
