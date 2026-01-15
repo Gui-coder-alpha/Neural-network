@@ -78,32 +78,38 @@ class Execução():
 #espaguete.
 
 
-Populacao = [Execução(Target) for _ in range(100)]
+Populacao = [Execução(Target) for _ in range(100)] #Realizamos a função em 100 vezes, o qual são os nossos indivíduos
+#Vale ressaltar que, a _ é uma variável descartável
 
-Erro_da_geração = []
-geracao = 100000
+Erro_da_geração = [] #Armazenamaos todas as redes aqui, o qual apenas a melhor se qualifica, demonstrando a evolução da rede neural
+geracao = 1000 #Vamos até a geração 1000, ou seja 1000 repetições
 
 
-for rede in range(geracao):
-    custos = []
-    for individuo in Populacao:
+for rede in range(geracao): #Aqui chamamos a classe, realizando as operações num loop, ao invés de dentro da própria classe
+    custos = [] 
+    for individuo in Populacao: #Basicamente o cálculo de custo/aptidão do tipo MSE
         saida = individuo.foward_function(Features_and_ones)
         erro = individuo.funcao_de_aptidao(saida) #saida = A2
         custos.append(erro)
     
-    Resultados_filtrados = np.argmin(custos)
-    Melhor_individuo = Populacao[Resultados_filtrados]
-    Erro_da_geração.append(custos[Resultados_filtrados])
+    Resultados_filtrados = np.argmin(custos) #Usamos o np.argmin, para selecionar a rede que apresenta o resultado com valores baixos.
+    Melhor_individuo = Populacao[Resultados_filtrados] #Pegamos o melhor indivíduo
+    Erro_da_geração.append(custos[Resultados_filtrados]) #Colocamos no erro da geração
     
-    nova_geracao = []
+    nova_geracao = [] #Nova geração deve aparecer
 
-    vencedor =Execução(Target, np.copy(Melhor_individuo.W1), np.copy(Melhor_individuo.W2))
+    vencedor =Execução(Target, np.copy(Melhor_individuo.W1), np.copy(Melhor_individuo.W2)) 
     nova_geracao.append(vencedor)
 
     for _ in range(100 - 1):
-        clone = Execução(Target, np.copy(Melhor_individuo.W1), np.copy(Melhor_individuo.W2))
-        clone.mutacao(0.01)
+        clone = Execução(Target, np.copy(Melhor_individuo.W1), np.copy(Melhor_individuo.W2)) #Os pesos são passados adiante, sendo herdado da melhor rede
+        clone.mutacao(0.01) #Mutação na nova geração para melhorar os resultados
         nova_geracao.append(clone)
+
+    if rede % 5 == 0: #Imprime a cada 100 gerações
+        plt.clf() # Limpa o gráfico anterior
+        plt.plot(Erro_da_geração)
+        plt.pause(0.01) # Pausa curta para o gráfico atualizar
     
     Populacao = nova_geracao
 
