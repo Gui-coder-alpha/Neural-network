@@ -26,11 +26,11 @@ while running:
     Ambient.base_floor(screen)
 #--------------> End <---------------
 
-# Obstacle/Objects
+#--------------> Obstacle/Objects <---------------
     Obstacle.spike(screen)
     losing = Obstacle.spike_hitbox()
 
-#    End
+#--------------------> End <----------------------
 
 
 # ----------> Player controls/visual <----------
@@ -44,7 +44,7 @@ while running:
 
 
     if touching.colliderect(losing):
-        print('nice')
+        Player_one.GAME_OVER()
 
 
     pygame.display.flip()
