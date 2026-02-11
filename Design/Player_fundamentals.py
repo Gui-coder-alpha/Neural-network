@@ -2,12 +2,15 @@ import pygame
 
 class Player:
     def __init__(self, screen):
-        self.player_pos = pygame.Vector2(screen.get_width() / 4, 400)
+        self.player_pos = pygame.Vector2(250, 400)
         self.dt = 1.2
         self.gravity = .87
         self.player_vel_y = 0
         self.in_ground = True
         self.CONTROL = True
+        self.fonte = pygame.font.SysFont("arial", 30)
+
+        self.text_game_over = self.fonte.render("GAME OVER", True, (255,255,255))
     def person_form(self, screen):
         pygame.draw.rect(screen, "blue", (int(self.player_pos.x), int(self.player_pos.y),100, 100))
 
@@ -18,14 +21,9 @@ class Player:
             if keys[pygame.K_w] and self.in_ground:
                 self.player_vel_y = -25
                 self.in_ground = False
-            if keys[pygame.K_a]:
-                self.player_pos.x -= 5 * self.dt
-            if keys[pygame.K_d]:
-                self.player_pos.x += 5 * self.dt
         if self.CONTROL == False:
-            print('over')
-
-
+            self.GAME_OVER_SCREEN
+            self.player_pos.y = 500
 
         self.player_vel_y += self.gravity
         self.player_pos.y += self.player_vel_y
@@ -41,6 +39,7 @@ class Player:
         player_hitbox = pygame.Rect(int(self.player_pos.x), int(self.player_pos.y), 100, 100)
         return player_hitbox
     
-    def GAME_OVER(self):
+    def GAME_OVER(self, screen):
         self.CONTROL = False
+        self.GAME_OVER_SCREEN = screen.blit(self.text_game_over,(640,360))
     
