@@ -5,7 +5,7 @@ import Objects
 import MachineLearning
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
+screen = pygame.display.set_mode((1280, 720), display= 0)
 clock = pygame.time.Clock()
 running = True
 
@@ -13,10 +13,10 @@ Player_one = Player_fundamentals.Player(screen)
 
 Obstacle = Objects.Blocks()
 
-#MACHINELEARNING = MachineLearning.NEUROEVOLUTION()
+Study = MachineLearning.Neuro()
 
 while running:
-    for event in pygame.event.get():
+    for event in pygame.event.get():    
         if event.type == pygame.QUIT:
             running = False
 
@@ -24,35 +24,34 @@ while running:
 #-------> Ambient/Background <-------
     Ambient.base_floor(screen)
 #--------------> End <---------------
-
+#///////////////////////////////////////////////////////////
 #--------------> Obstacle/Objects <---------------
-    ENEMY_OF_ML = Obstacle.spike(screen)
+    Obstacle.spike(screen)
     losing = Obstacle.spike_hitbox()
+    Obstacle.spike_velocity()
 
 #--------------------> End <----------------------
-
-
+#///////////////////////////////////////////////////////////
 # ----------> Player controls/visual <----------
-    ML_PLAYER = Player_one.person_form(screen)
+    Player_one.person_form(screen)
 
     keys = pygame.key.get_pressed()
     Player_one.person_movements(keys)
     touching = Player_one.hitbox()
 
 #----------------> End Player <-----------------
-
-
+#///////////////////////////////////////////////////////
+#--------------->Lose game<-----------------------
     if touching.colliderect(losing):
         Player_one.GAME_OVER(screen)
         Obstacle.exclude_spike()
 
     Obstacle.repeat_spike()
+#-------------->end of lose game<-------------------------
 
 
 
-
-
-    #MACHINELEARNING.NEUROEVOLUTION(screen)
+    Study.Features(Player_one, Obstacle)
 
     pygame.display.flip()
     clock.tick(144)
