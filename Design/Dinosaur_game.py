@@ -5,7 +5,7 @@ import Objects
 import MachineLearning
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720), display= 0)
+screen = pygame.display.set_mode((1280, 720), display= 1)
 clock = pygame.time.Clock()
 running = True
 
