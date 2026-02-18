@@ -1,7 +1,11 @@
 import pygame
+import random
 
 class Player:
-    def __init__(self, screen):
+    def __init__(self, screen, ML):
+        colors = ["purple", "blue", "green", "pink", "white"]
+        self.fix_color = random.choice(colors)
+
         self.player_pos = pygame.Vector2(250, 400)
         self.dt = 1.2
         self.gravity = .87
@@ -11,8 +15,11 @@ class Player:
         self.fonte = pygame.font.SysFont("arial", 30)
 
         self.text_game_over = self.fonte.render("GAME OVER", True, (255,255,255))
+
+        self.alive = True
+        self.neuron = ML
     def person_form(self, screen):
-        pygame.draw.rect(screen, "blue", (int(self.player_pos.x), int(self.player_pos.y),100, 100))
+        pygame.draw.rect(screen, self.fix_color, (int(self.player_pos.x), int(self.player_pos.y),100, 100))
 
     def person_movements(self,keys):
         if self.CONTROL == True:

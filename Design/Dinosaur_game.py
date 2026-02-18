@@ -9,11 +9,16 @@ screen = pygame.display.set_mode((1280, 720), display= 1)
 clock = pygame.time.Clock()
 running = True
 
-Player_one = Player_fundamentals.Player(screen)
-
 Obstacle = Objects.Blocks()
 
-Study = MachineLearning.Neuro()
+
+Population = []
+for _ in range(100):
+    ML = MachineLearning.Neuro()
+    Players = Player_fundamentals.Player(screen, ML)
+    Players.neuron = ML
+    Population.append(Players)
+
 
 while running:
     for event in pygame.event.get():    
@@ -50,8 +55,13 @@ while running:
 #-------------->end of lose game<-------------------------
 
 
+#/////////////////////////////////////////////////////////////////////////
+#------------------------>Machine Learning part<----------------------------
+    ML.Features(Player_one, Obstacle)
 
-    Study.Features(Player_one, Obstacle)
+
+
+
 
     pygame.display.flip()
     clock.tick(144)

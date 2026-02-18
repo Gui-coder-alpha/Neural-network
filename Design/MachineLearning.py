@@ -11,6 +11,8 @@ class Neuro:
 
         self.matrix_of_ones = np.ones((1,1))
 
+        
+
     def Features(self, Player, Obstacle):
         hitbox_player = Player.hitbox() #serve para distância alémd e hitbox.
         hitbox_obstacle = Obstacle.spike_hitbox() #vai servir para distância? Sim serviu
@@ -24,7 +26,7 @@ class Neuro:
 
         features = np.array([distanceX_ML, positionY_ML, player_height, objectvelocity, distanceY_ML_object]).reshape(1,5) #X = features
         features_tranformed = np.concatenate((features, self.matrix_of_ones), axis=1) #Dados principais
-        print(features_tranformed)
+        #print(features_tranformed)
         return features_tranformed
 
     def sum_Z(self, features_transformed, Pesos, bias):
@@ -32,16 +34,26 @@ class Neuro:
         return Z_value
 
     def Sigmoid_result(self, Z_value):
-        sigmoid_function = 1/(1 - np.exp(- np.clip(Z_value, -500, 500)))
+        sigmoid_function = 1/(1 + np.exp(- np.clip(Z_value, -500, 500)))
         return sigmoid_function
     
     def Foward_function(self):
-        Hidden_Layer_Z = self.sum_Z(self.Features(), self.weights_input_hidden, self.bias_hidden)
+        Matrix_Data = self.Features()
+        Hidden_Layer_Z = self.sum_Z(Matrix_Data, self.weights_input_hidden, self.bias_hidden)
         Hidden_Layer_results = self.Sigmoid_result(Hidden_Layer_Z)
+        print(Hidden_Layer_results)
 
         Output_layer_Z = self.sum_Z(Hidden_Layer_results, self.weights_hidden_output, self.bias_output)
         Output_layer_results = self.Sigmoid_result(Output_layer_Z)
         return Output_layer_results
 
     def Mutation(self):
-        self.weights_hidden_output += * 0,01
+        self.weights_input_hidden += np.random.randn(*self.weights_input_hidden.shape) * 0.1
+        self.weights_hidden_output += np.random.randn(*self.weights_hidden_output.shape) * 0.1
+
+        self.bias_hidden += np.random.randn(*self.bias_hidden.shape) * 0.1
+        self.bias_output += np.random.randn(*self.bias_output.shape) * 0.1
+
+    def Simple_calculus(self, score):
+        Best_score = score * 0.1
+        return Best_score
