@@ -9,10 +9,6 @@ class Neuro:
         self.bias_hidden = np.random.uniform(-1, 1, (1, hidden_size)) #B = Bias
         self.bias_output = np.random.uniform(-1, 1, (1, output_size)) #B = Bias
 
-        self.matrix_of_ones = np.ones((1,1))
-
-        
-
     def Features(self, Player, Obstacle):
         hitbox_player = Player.hitbox() #serve para distância alémd e hitbox.
         hitbox_obstacle = Obstacle.spike_hitbox() #vai servir para distância? Sim serviu
@@ -24,10 +20,9 @@ class Neuro:
         player_height = hitbox_player.height / 100
         objectvelocity = -8 /20
 
-        features = np.array([distanceX_ML, positionY_ML, player_height, objectvelocity, distanceY_ML_object]).reshape(1,5) #X = features
-        features_tranformed = np.concatenate((features, self.matrix_of_ones), axis=1) #Dados principais
+        features = np.array([distanceX_ML, positionY_ML, player_height, objectvelocity, distanceY_ML_object]).reshape(1,5) #X = features #Dados principais
         #print(features_tranformed)
-        return features_tranformed
+        return features
 
     def sum_Z(self, features_transformed, Pesos, bias):
         Z_value = (features_transformed @ Pesos) + bias
@@ -37,8 +32,8 @@ class Neuro:
         sigmoid_function = 1/(1 + np.exp(- np.clip(Z_value, -500, 500)))
         return sigmoid_function
     
-    def Foward_function(self):
-        Matrix_Data = self.Features()
+    def Foward_function(self, Players, Obstacle):
+        Matrix_Data = self.Features(Players, Obstacle)
         Hidden_Layer_Z = self.sum_Z(Matrix_Data, self.weights_input_hidden, self.bias_hidden)
         Hidden_Layer_results = self.Sigmoid_result(Hidden_Layer_Z)
         print(Hidden_Layer_results)

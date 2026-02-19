@@ -9,6 +9,7 @@ screen = pygame.display.set_mode((1280, 720), display= 1)
 clock = pygame.time.Clock()
 running = True
 
+#---------FUNCTIONS-----------------
 Obstacle = Objects.Blocks()
 
 
@@ -38,18 +39,18 @@ while running:
 #--------------------> End <----------------------
 #///////////////////////////////////////////////////////////
 # ----------> Player controls/visual <----------
-    Player_one.person_form(screen)
+    #Player_one.person_form(screen)
 
-    keys = pygame.key.get_pressed()
-    Player_one.person_movements(keys)
-    touching = Player_one.hitbox()
+    #keys = pygame.key.get_pressed()
+    #Player_one.person_movements(keys)
+    #touching = Player_one.hitbox()
 
 #----------------> End Player <-----------------
 #///////////////////////////////////////////////////////
 #--------------->Lose game<-----------------------
-    if touching.colliderect(losing):
-        Player_one.GAME_OVER(screen)
-        Obstacle.exclude_spike()
+    #if touching.colliderect(losing):
+     #   Player_one.GAME_OVER(screen)
+      #  Obstacle.exclude_spike()
 
     Obstacle.repeat_spike()
 #-------------->end of lose game<-------------------------
@@ -57,7 +58,16 @@ while running:
 
 #/////////////////////////////////////////////////////////////////////////
 #------------------------>Machine Learning part<----------------------------
-    ML.Features(Player_one, Obstacle)
+    for Players in Population:
+        if Players.alive:
+            decision = Players.neuron.Foward_function(Players, Obstacle)
+            if decision[0][0] > 0.5 and Players.in_ground:
+                Players.Jump()
+            Players.person_movements()
+            Players.person_form(screen)
+            ML_hitbox = Players.hitbox()
+            if ML_hitbox.colliderect(losing):
+                Players.alive = False
 
 
 
