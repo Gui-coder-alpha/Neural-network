@@ -36,7 +36,6 @@ class Neuro:
         Matrix_Data = self.Features(Players, Obstacle)
         Hidden_Layer_Z = self.sum_Z(Matrix_Data, self.weights_input_hidden, self.bias_hidden)
         Hidden_Layer_results = self.Sigmoid_result(Hidden_Layer_Z)
-        print(Hidden_Layer_results)
 
         Output_layer_Z = self.sum_Z(Hidden_Layer_results, self.weights_hidden_output, self.bias_output)
         Output_layer_results = self.Sigmoid_result(Output_layer_Z)

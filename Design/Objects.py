@@ -4,7 +4,9 @@ class Blocks:
     def __init__(self):
         self.rain = True
         self.object_position = pygame.Vector2(1280, 450)
-        self.score = 0
+        self.points_for_score = pygame.Vector2(1280,450)
+
+        self.cycle_of_point = 0
 
     def spike(self, screen):
         spike_form = pygame.draw.rect(screen, "red", (int(self.object_position.x), int(self.object_position.y), 100, 150))
@@ -19,8 +21,14 @@ class Blocks:
     def repeat_spike(self):
         if self.object_position == (0, 450):
             self.object_position.x = 1280
-            self.score += 1
-            print(self.score)
+            self.cycle_of_point += 1
 
     def exclude_spike(self):
         self.object_position.x = 250
+        
+    def hitbox_point(self, screen):
+        scored = pygame.Rect((int(self.object_position.x + 100), int(self.object_position.y), 300, 150))
+        return scored
+    
+    def delete(self):
+        self.object_position.y += 600

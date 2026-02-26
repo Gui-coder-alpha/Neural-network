@@ -3,7 +3,7 @@ import random
 
 class Player:
     def __init__(self, screen, ML):
-        colors = ["purple", "blue", "green", "pink", "white"]
+        colors = ["purple", "blue", "green", "pink", "white","brown","orange","yellow"]
         self.fix_color = random.choice(colors)
 
         self.player_pos = pygame.Vector2(250, 400)
@@ -20,6 +20,10 @@ class Player:
         
         self.alive = True
         self.neuron = ML
+
+        self.score = 0
+
+        self.last_score = -1
     def person_form(self, screen):
         pygame.draw.rect(screen, self.fix_color, (int(self.player_pos.x), int(self.player_pos.y),100, 100))
 
@@ -45,4 +49,10 @@ class Player:
     def Jump(self):
         self.player_vel_y -= 25
         self.in_ground = False
+
+    def Loser(self):
+        self.player_vel_y = 700
     
+    def Unique_points(self):
+        self.score += 1
+        print(self.score)
