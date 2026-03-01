@@ -30,5 +30,5 @@ class Blocks:
         scored = pygame.Rect((int(self.object_position.x + 100), int(self.object_position.y), 300, 150))
         return scored
     
-    def delete(self):
-        self.object_position.y += 600
+    def pause(self):
+        self.object_position.x = 1280

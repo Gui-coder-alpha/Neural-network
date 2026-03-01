@@ -56,3 +56,4 @@ class Player:
     def Unique_points(self):
         self.score += 1
         print(self.score)
+    
