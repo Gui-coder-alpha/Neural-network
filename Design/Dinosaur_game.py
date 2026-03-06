@@ -4,6 +4,7 @@ import Player_fundamentals
 import Objects
 import MachineLearning
 import numpy as np
+import random
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720), display=0)
@@ -38,13 +39,16 @@ while running:
 #--------------> End <---------------
 #///////////////////////////////////////////////////////////
 #--------------> Obstacle/Objects <---------------
+
     points = Obstacle.hitbox_point(screen)
     Obstacle.spike(screen)
     losing = Obstacle.spike_hitbox()
     Obstacle.spike_velocity()
     Obstacle.repeat_spike()
+    Obstacle.fly_spike(screen)
 
     keys = pygame.key.get_pressed()
+    Obstacle.gen(screen)
 
 #--------------------> End <----------------------
 #///////////////////////////////////////////////////////////
@@ -82,33 +86,42 @@ while running:
 
             if ML_hitbox.colliderect(losing):
                 Players.player_vel_y -= 1000
-                Players.in_ground = True
-                if Players.in_ground == True:
-                    Players.alive = False
-                    Losers += 1
-                    print(f"LOSER ML")
+                Losers += 1
+                Players.alive = False
+                print(f"LOSER ML")
                 if Losers == Iterations:
                     print("MORREU TODO MUNDO GERAL")
-                    timeout = True
                     
                     all_points = np.array([Players.score for Players in Population])
                     Best_index = np.argmax(all_points)
                     Father_player = Population[Best_index]
+
                     
                     best_bias_hidden = np.copy(Father_player.neuron.bias_hidden)
                     best_weights_hidden = np.copy(Father_player.neuron.weights_input_hidden)
                     best_bias_output = np.copy(Father_player.neuron.bias_output)
                     best_weights_output = np.copy(Father_player.neuron.weights_hidden_output)
+                    
+                    
+                    
                     death_time = pygame.time.get_ticks()
+                    timeout = True
 
     if timeout == True:
         timer_actual = pygame.time.get_ticks()
         Obstacle.pause()
         if timer_actual - death_time >= 3000:
             print("recomeçando////////")
+            Obstacle.gen_plus()
             timeout = False
             Losers = 0
             for i, p in enumerate(Population):
+                p.neuron.weights_input_hidden = np.copy(best_weights_hidden)    
+                p.neuron.weights_hidden_output = np.copy(best_weights_output)
+                p.neuron.bias_hidden = np.copy(best_bias_hidden)
+                p.neuron.bias_output = np.copy(best_bias_output)
+
+
                 p.alive = True
                 p.score = 0
                 p.last_score = -1
@@ -117,6 +130,10 @@ while running:
                 if i > 0:
                     p.neuron.Mutation()
 
+    if Obstacle.Exponencial_value == 24:
+        Obstacle.sum = 0
+
+    
 
     pygame.display.flip()
     clock.tick(144)
