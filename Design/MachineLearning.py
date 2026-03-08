@@ -12,7 +12,7 @@ class Neuro:
 
     def Features(self, Player, Obstacle):
         hitbox_player = Player.hitbox() #serve para distância alémd e hitbox.
-        hitbox_obstacle = Obstacle.spike_hitbox() #vai servir para distância? Sim serviu
+        hitbox_obstacle = Obstacle.spike_hitboxes() #vai servir para distância? Sim serviu
         speed_spike = Obstacle.speed_info()
 
 
@@ -42,7 +42,7 @@ class Neuro:
 
         Output_layer_Z = self.sum_Z(Hidden_Layer_results, self.weights_hidden_output, self.bias_output)
         Output_layer_results = self.Sigmoid_result(Output_layer_Z)
-        print(Output_layer_results)
+        #print(Output_layer_results)
         return Output_layer_results
 
     def Mutation(self):

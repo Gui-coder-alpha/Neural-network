@@ -4,7 +4,6 @@ import Player_fundamentals
 import Objects
 import MachineLearning
 import numpy as np
-import random
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720), display=0)
@@ -14,7 +13,7 @@ running = True
 #---------FUNCTIONS-----------------
 Obstacle = Objects.Blocks()
 
-Iterations = 20
+Iterations = 200
 
 Population = []
 for _ in range(Iterations):
@@ -39,13 +38,11 @@ while running:
 #--------------> End <---------------
 #///////////////////////////////////////////////////////////
 #--------------> Obstacle/Objects <---------------
-
     points = Obstacle.hitbox_point(screen)
-    Obstacle.spike(screen)
-    losing = Obstacle.spike_hitbox()
+    Obstacle.spikes(screen)
+    losing = Obstacle.spike_hitboxes()
     Obstacle.spike_velocity()
     Obstacle.repeat_spike()
-    Obstacle.fly_spike(screen)
 
     keys = pygame.key.get_pressed()
     Obstacle.gen(screen)
@@ -130,7 +127,7 @@ while running:
                 if i > 0:
                     p.neuron.Mutation()
 
-    if Obstacle.Exponencial_value == 24:
+    if Obstacle.Exponencial_value >= 24:
         Obstacle.sum = 0
 
     

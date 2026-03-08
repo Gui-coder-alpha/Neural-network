@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Blocks:
     def __init__(self):
@@ -9,20 +10,33 @@ class Blocks:
         self.cycle_of_point = 0
         self.fonte = pygame.font.SysFont("arial", 30)
         self.generation_number = 1
-        self.Exponencial_value = 8
-        self.sum = 1
+        self.Exponencial_value = 5
+        self.sum = .4
 
-    def spike(self, screen):
-        spike_form = pygame.draw.rect(screen, "red", (int(self.object_position.x), int(self.object_position.y), 100, 150))
-        return  spike_form
-    def spike_hitbox(self):
-        return pygame.Rect((int(self.object_position.x), int(self.object_position.y), 100, 150))
-    
-    def fly_spike(self, screen):
-        spike_draw = pygame.draw.rect(screen, "red", (int(self.object_position.x), int(self.object_position.y)+20, 100, 100))
-        return spike_draw
-    def fly_hitbox(self):
-        return pygame.Rect((int(self.object_position.x), int(self.object_position.y)+20, 100, 100))
+        self.the_choice = [0, 1]
+        self.true_choice = 0
+        self.image_spike = pygame.image.load("Design/Images/yep.png").convert_alpha()
+        self.image_one_formated = pygame.transform.scale(self.image_spike, (150, 200))
+        self.image_bird = pygame.image.load("Design/Images/bird.png").convert_alpha()
+        self.image_two_formated = pygame.transform.scale(self.image_bird, (200, 150))
+
+    def random_spike(self):
+        self.true_choice = random.choice(self.the_choice)
+        return self.true_choice
+
+
+    def spikes(self, screen):
+        if self.true_choice == 0:
+            spike_form = screen.blit(self.image_one_formated, (int(self.object_position.x), int(self.object_position.y)-50))
+            return  spike_form
+        if self.true_choice == 1:
+            spike_draw = screen.blit(self.image_two_formated, (int(self.object_position.x), int(self.object_position.y)-200))
+            return spike_draw
+    def spike_hitboxes(self):
+        if self.true_choice == 0:
+            return pygame.Rect((int(self.object_position.x), int(self.object_position.y), 100, 150))
+        if self.true_choice == 1:
+            return pygame.Rect((int(self.object_position.x), int(self.object_position.y)-200, 100, 150))
 
 
     
@@ -38,14 +52,18 @@ class Blocks:
             self.object_position.x = 1290
             self.cycle_of_point += 1
             self.Exponencial_value += self.sum
-
+            self.random_spike()
     def exclude_spike(self):
         self.object_position.x = 250
         
     def hitbox_point(self, screen):
-        scored = pygame.Rect((int(self.object_position.x + 100), int(self.object_position.y), 300, 150))
-        return scored
-    
+        if self.true_choice == 0:
+            scored = pygame.Rect((int(self.object_position.x + 100), int(self.object_position.y), 300, 150))
+            return scored
+        if self.true_choice == 1:
+            scored = pygame.Rect((int(self.object_position.x + 100), int(self.object_position.y)+87, 300, 100))
+            return scored
+
     def pause(self):
         self.object_position.x = 1280
 
