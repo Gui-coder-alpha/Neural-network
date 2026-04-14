@@ -43,7 +43,7 @@ class Neuro:
         Output_layer_Z = self.sum_Z(Hidden_Layer_results, self.weights_hidden_output, self.bias_output)
         Output_layer_results = self.Sigmoid_result(Output_layer_Z)
         #print(Output_layer_results)
-        return Output_layer_results
+        return Output_layer_results, Hidden_Layer_results
 
     def Mutation(self):
         self.weights_input_hidden += np.random.randn(*self.weights_input_hidden.shape) * 0.5
