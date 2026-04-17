@@ -2,7 +2,7 @@ import numpy as np
 import pygame
 import Objects
 class Neuro:
-    def __init__(self,input_size=5, hidden_size=6, output_size=1):
+    def __init__(self,input_size=7, hidden_size=6, output_size=1):
         self.weights_input_hidden = np.random.uniform(-1, 1, (input_size, hidden_size)) #W = weights
         self.weights_hidden_output = np.random.uniform(-1, 1, (hidden_size, output_size)) #W = Weights
 
@@ -14,6 +14,7 @@ class Neuro:
         hitbox_player = Player.hitbox() #serve para distância alémd e hitbox.
         hitbox_obstacle = Obstacle.spike_hitboxes() #vai servir para distância? Sim serviu
         speed_spike = Obstacle.speed_info()
+        orb_index = Obstacle.orb_hitbox()
 
 
         distanceX_ML = (hitbox_obstacle.x - hitbox_player.x) / 1280 
@@ -23,7 +24,10 @@ class Neuro:
         player_height = hitbox_player.height / 100
         objectvelocity = speed_spike /720
 
-        features = np.array([distanceX_ML, positionY_ML, player_height, objectvelocity, distanceY_ML_object]).reshape(1,5) #X = features #Dados principais
+        distance_of_orbX_ML = (orb_index.x - hitbox_player.x) / 1280
+        distance_of_orbY_ML = (orb_index.y - hitbox_player.y)/ 720
+
+        features = np.array([distanceX_ML, positionY_ML, player_height, objectvelocity, distanceY_ML_object, distance_of_orbX_ML, distance_of_orbY_ML]).reshape(1,7) #X = features #Dados principais
         #print(features_tranformed)
         return features
 

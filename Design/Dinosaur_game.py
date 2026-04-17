@@ -29,8 +29,9 @@ timeout = False
 runs = True
 
 Final_points = []
-Gen_count = 0
+Gen_count = 1
 Gen_list = []
+data_points = 0
 update = False
 
 while running:
@@ -49,11 +50,14 @@ while running:
     losing = Obstacle.spike_hitboxes()
     Obstacle.spike_velocity()
     Obstacle.repeat_spike()
-    hitbox_jump = Obstacle.orb_jump()
     wall = Obstacle.big_wall()
 
     keys = pygame.key.get_pressed()
     Obstacle.gen(screen)
+
+    if Obstacle.true_choice == 2:
+        orb_hitbox_in_game = Obstacle.orb_hitbox()
+
 
 #--------------------> End <----------------------
 #///////////////////////////////////////////////////////////
@@ -88,10 +92,8 @@ while running:
             if decision[0][0] > 0.5 and Players.in_ground:
                 Players.Jump()
             ML_hitbox = Players.hitbox()
-            if ML_hitbox.colliderect(hitbox_jump) and Obstacle.orb_activate:
-                Players.gravity = 0.45
-            if Players.in_ground:
-                Players.gravity = 0.98
+            if ML_hitbox.colliderect(orb_hitbox_in_game):
+                Players.gravity = 0.48
             if ML_hitbox.colliderect(wall):
                 Players.gravity = 0.98
             if ML_hitbox.colliderect(points):
@@ -107,6 +109,7 @@ while running:
                 if Losers == Iterations:
                     all_points = np.array([Players.score for Players in Population])
                     Best_index = np.argmax(all_points)
+                    data_points = max(all_points)
                     Father_player = Population[Best_index]
                     
                     best_bias_hidden = np.copy(Father_player.neuron.bias_hidden)
@@ -129,8 +132,7 @@ while running:
 
         if not update:
             Gen_count += 1
-            best_unique_points = Father_player.score
-            Final_points.append(best_unique_points)
+            Final_points.append(data_points)
             Gen_list.append(Gen_count)
             Graph.plot_the_graph(Final_points, Gen_list)
             update = True
@@ -141,14 +143,16 @@ while running:
             timeout = False
             Obstacle.gen_plus()
             Losers = 0
+
             for i, p in enumerate(Population):
+                p.gravity = 0.98
                 p.neuron.weights_input_hidden = np.copy(best_weights_hidden)    
                 p.neuron.weights_hidden_output = np.copy(best_weights_output)
                 p.neuron.bias_hidden = np.copy(best_bias_hidden)
                 p.neuron.bias_output = np.copy(best_bias_output)
 
-                p.alive = True
                 p.score = 0
+                p.alive = True
                 p.last_score = -1
                 p.player_pos = pygame.Vector2(250, 400)
                 p.player_vel_y = 0
