@@ -7,7 +7,7 @@ import numpy as np
 import Graphic
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720), display=1)
+screen = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN, display=1)
 clock = pygame.time.Clock()
 running = True
 
@@ -15,7 +15,7 @@ running = True
 Obstacle = Objects.Blocks()
 Graph = Graphic
 
-Iterations = 200
+Iterations = 300
 
 Population = []
 for _ in range(Iterations):
@@ -29,7 +29,7 @@ timeout = False
 runs = True
 
 Final_points = []
-Gen_count = 1
+Gen_count = 0
 Gen_list = []
 data_points = 0
 update = False
@@ -133,6 +133,7 @@ while running:
         if not update:
             Gen_count += 1
             Final_points.append(data_points)
+            print(Final_points)
             Gen_list.append(Gen_count)
             Graph.plot_the_graph(Final_points, Gen_list)
             update = True
@@ -145,6 +146,7 @@ while running:
             Losers = 0
 
             for i, p in enumerate(Population):
+                Objects.Exponencial_value = 7.2
                 p.gravity = 0.98
                 p.neuron.weights_input_hidden = np.copy(best_weights_hidden)    
                 p.neuron.weights_hidden_output = np.copy(best_weights_output)
@@ -161,8 +163,6 @@ while running:
 
     if Obstacle.Exponencial_value >= 24:
         Obstacle.sum = 0
-
-    
 
     pygame.display.flip()
     clock.tick(144)

@@ -16,7 +16,7 @@ class Blocks:
         self.sum = .4
 
         self.the_choice = [0, 1, 2]
-        self.true_choice = 2
+        self.true_choice = random.choice(self.the_choice)
         self.image_spike = pygame.image.load("Design/Images/yep.png").convert_alpha()
         self.image_one_formated = pygame.transform.scale(self.image_spike, (100, 150))
         self.image_bird = pygame.image.load("Design/Images/bird.png").convert_alpha()
